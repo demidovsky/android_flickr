@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements Callback<Result> 
     private PhotosDBHelper helper;
     private boolean loading = false;
     private final int threshold = 40;
+    private final String API_KEY = "6d7c2e73141dbdfaa03a3c93dc6b2947";
 
 
     @Override
@@ -176,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements Callback<Result> 
                 search,
                 "flickr.photos.search",
                 "json",
-                "d8e561f63a10489788fe1e37f351d738",
+                API_KEY,
                 1,
                 page
         );
@@ -190,9 +191,19 @@ public class MainActivity extends AppCompatActivity implements Callback<Result> 
 
     @Override
     public void onResponse(Call<Result> call, Response<Result> response) {
-        Photos body = response.body().getPhotos();
+        Photos body;
 
-        currentPage = body.getPage();
+        try {
+            body = response.body().getPhotos();
+            currentPage = body.getPage();
+        }
+        catch (Exception e)
+        {
+            Toast.makeText(this, "Проблемы с загрузкой", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
 
         String sql = "insert into "
                 + PhotosTable.TABLE_PHOTOS
